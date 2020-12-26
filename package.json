@@ -4,7 +4,8 @@
   "description": "Close new issues that meet certain conditions.",
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint ./src",
+    "check-format": "prettier --check ./src/**.js",
     "prepare": "ncc build index.js -o dist --source-map --license licenses.txt",
     "test": "jest",
     "all": "npm run lint && npm run prepare && npm run test"
@@ -30,6 +31,7 @@
   "devDependencies": {
     "@vercel/ncc": "^0.25.1",
     "eslint": "^7.4.0",
-    "jest": "^26.1.0"
+    "jest": "^26.1.0",
+    "prettier": "^2.2.1"
   }
 }
