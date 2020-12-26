@@ -2,7 +2,7 @@
   "name": "invalid-issue-closer",
   "version": "0.1.0",
   "description": "Close new issues that meet certain conditions.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "lint": "eslint .",
     "prepare": "ncc build index.js -o dist --source-map --license licenses.txt",
