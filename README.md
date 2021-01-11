@@ -1,74 +1,65 @@
-# Create a JavaScript Action
+# [invalid-issue-closer GitHub Action](https://github.com/ddbeck/invalid-issue-closer)
 
-<p align="center">
-  <a href="https://github.com/actions/javascript-action/actions"><img alt="javscript-action status" src="https://github.com/actions/javascript-action/workflows/units-test/badge.svg"></a>
-</p>
+by Daniel D. Beck.
 
-Use this template to bootstrap the creation of a JavaScript action.:rocket:
+The `invalid-issue-closer` GitHub Action helps you close nuisance issues. It checks whether a new issue contains specific text in the title or body and, if it does, closes it. For example, you can use this action to automatically close issues which contain unmodified template text.
 
-This template includes tests, linting, a validation workflow, publishing, and versioning guidance.
+This was created specifically for [mdn/browser-compat-data](https://github.com/mdn/browser-compat-data); see [#8017](https://github.com/mdn/browser-compat-data/issues/8017) for background.
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+You're free to use, share, and modify this action; see the [LICENSE](./LICENSE) for detials. This action is derived from the [actions/javascript-action](https://github.com/actions/javascript-action/tree/v1.0.1) template. See that repository for even more information.
 
-## Create an action from this template
+## Use this action
 
-Click the `Use this Template` and provide the new repo details for your action
+Add this action as a step on a new or existing workflow. The basic usage looks like this:
 
-## Code in Main
-
-Install the dependencies
-
-```bash
-npm install
+```yaml
+- uses: ddbeck/invalid-issue-closer@v1
+  with:
+    repo-token: ${{ secrets.GITHUB_TOKEN }}
+    labels: label1,label2
+    comment: "A message to post when closing the issue."
+    title-contains: "<PUT TITLE HERE>"
+    body-contains: "<PUT PROBLEM DESCRIPTION HERE>"
 ```
 
-Run the tests :heavy_check_mark:
+The `with` settings are:
 
-```bash
-$ npm test
+- `repo-token` (**required**): The `GITHUB_TOKEN` secret.
+- `labels` (optional): A comma-separated list of labels to apply to issues closed by this action.
+- `comment` (optional): A message to post when closing the issue.
+- `title-contains` (optional): Text that, if matched, closes the issue.
+- `body-contains` (optional): Text that, if matched, closes the issue.
 
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-...
+**Note**: If both `title-contains` and `body-contains` are set, then both conditions must be satisifed to close the issue.
+
+For example, to run this on newly-created issues, create a file called `.github/workflows/close-invalid-issues.yml` containing the following:
+
+```yaml
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  close-incomplete-issue-templates:
+    steps:
+      - uses: ddbeck/invalid-issue-closer@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          labels: "invalid :no_entry_sign:"
+          comment: "This issue was automatically closed because it appears that the issue template has not been completed."
+          title-contains: "<PUT TITLE HERE>"
+          body-contains: "<PUT PROBLEM DESCRIPTION HERE>"
 ```
 
-## Change action.yml
+## Maintenance
 
-The action.yml defines the inputs and output for your action.
+To maintain this action, here are some documentation left over from the [actions/javascript-action](https://github.com/actions/javascript-action/tree/v1.0.1) template.
 
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-const core = require('@actions/core');
-...
-
-async function run() {
-  try {
-      ...
-  }
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Package for distribution
+### Package for distribution
 
 GitHub Actions will run the entry point from the action.yml. Packaging assembles the code into one file that can be checked in to Git, enabling fast and reliable execution and preventing the need to check in node_modules.
 
-Actions are run from GitHub repos.  Packaging the action will create a packaged action in the dist folder.
+Actions are run from GitHub repos. Packaging the action will create a packaged action in the dist folder.
 
 Run prepare
 
@@ -82,7 +73,7 @@ Since the packaged index.js is run from the dist folder.
 git add dist
 ```
 
-## Create a release branch
+### Create a release branch
 
 Users shouldn't consume the action from master since that would be latest code and actions can break compatibility between major versions.
 
@@ -102,15 +93,3 @@ Note: We recommend using the `--license` option for ncc, which will create a lic
 Your action is now published! :rocket:
 
 See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Usage
-
-You can now consume the action by referencing the v1 branch
-
-```yaml
-uses: actions/javascript-action@v1
-with:
-  milliseconds: 1000
-```
-
-See the [actions tab](https://github.com/actions/javascript-action/actions) for runs of this action! :rocket:
