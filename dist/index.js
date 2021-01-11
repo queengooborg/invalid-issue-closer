@@ -5859,6 +5859,8 @@ const isInvalid = __webpack_require__(313);
 async function run() {
   try {
     const token = core.getInput("repo-token", { required: true });
+    const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+
     const settings = {
       labels: core.getInput("labels") || undefined,
       comment: core.getInput("comment") || undefined,
@@ -5871,17 +5873,21 @@ async function run() {
     core.debug("Getting GitHub issue context");
     const octokit = github.getOctokit(token);
     const context = github.context;
+    const issue_number = context.payload.issue.number;
 
-    core.debug(
-      `Getting details for ${context.repository}#${context.issue_number}`
-    );
-    const issue = await octokit.issues.get(context);
+    const issueDetails = {
+      owner,
+      repo,
+      issue_number,
+    };
 
-    core.debug(
-      `Checking validity of ${context.repository}#${context.issue_number}`
-    );
+    core.debug(`Getting details for ${owner}/${repo}#${issue_number}`);
+    const issue = (await octokit.issues.get(issueDetails)).data;
+    core.debug(JSON.stringify(issue, undefined, 2));
+
+    core.debug(`Checking validity of ${owner}/${repo}#${issue_number}`);
     if (isInvalid(issue, conditions)) {
-      await handleInvalidIssue(octokit, context, settings);
+      await handleInvalidIssue(octokit, issueDetails, settings);
     }
   } catch (error) {
     core.setFailed(error.message);

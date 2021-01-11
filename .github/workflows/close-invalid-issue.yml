@@ -1,7 +1,7 @@
 # test action works running from the graph
 on:
   issues:
-    types: [opened]
+    types: [opened, reopened]
 
 jobs:
   close-issues:
@@ -13,5 +13,5 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           labels: "invalid"
           comment: "This was a successful test of the issue closing system."
-          title-contains: "closme"
+          title-contains: "closeme"
           body-contains: "closeme"
