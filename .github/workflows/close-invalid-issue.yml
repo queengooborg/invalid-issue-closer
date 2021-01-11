@@ -11,7 +11,7 @@ jobs:
       - uses: ./
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          labels: "invalid"
+          labels: "invalid :no_entry_sign:"
           comment: "This was a successful test of the issue closing system."
           title-contains: "closeme"
           body-contains: "closeme"
