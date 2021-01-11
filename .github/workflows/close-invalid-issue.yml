@@ -1,0 +1,17 @@
+# test action works running from the graph
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  close-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          labels: "invalid"
+          comment: "This was a successful test of the issue closing system."
+          title-contains: "closme"
+          body-contains: "closeme"
