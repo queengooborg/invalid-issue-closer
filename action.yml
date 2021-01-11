@@ -1,13 +1,21 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: "invalid-issue-closer"
+description: "Close an issue if it meets some requirements"
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  repo-token:
+    description: "The GITHUB_TOKEN secret"
     required: true
-    default: '1000'
-outputs:
-  time: # output will be available to future steps
-    description: 'The message to output'
+
+  labels:
+    description: "A comma-separated list of labels to apply"
+
+  comment:
+    description: "A GitHub Flavored Markdown string to comment on the invalid issue"
+
+  # Possible conditions
+  title-contains:
+    description: "String to search for in issue title"
+  body-contains:
+    description: "String to search for in issue body"
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"
