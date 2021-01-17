@@ -15,4 +15,4 @@ jobs:
           comment: "This was a successful test of the issue closing system."
           normalize-newlines: true
           title-contains: "<PUT TITLE HERE>"
-          body-contains: "<!-- Tips: where applicable, specify browser name, browser version, and mobile operating system version -->\r\n\r\n#### What information was incorrect, unhelpful, or incomplete?\r\n\r\n#### What did you expect to see?\r\n\r\n#### Did you test this? If so, how?\r\n\r\n"
+          body-contains: "<!-- Tips: where applicable, specify browser name, browser version, and mobile operating system version -->\n\n#### What information was incorrect, unhelpful, or incomplete?\n\n#### What did you expect to see?\n\n#### Did you test this? If so, how?\n\n"
