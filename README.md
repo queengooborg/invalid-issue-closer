@@ -18,6 +18,7 @@ Add this action as a step on a new or existing workflow. The basic usage looks l
     repo-token: ${{ secrets.GITHUB_TOKEN }}
     labels: label1,label2
     comment: "A message to post when closing the issue."
+    normalize-newlines: true
     title-contains: "<PUT TITLE HERE>"
     body-contains: "<PUT PROBLEM DESCRIPTION HERE>"
 ```
@@ -25,10 +26,11 @@ Add this action as a step on a new or existing workflow. The basic usage looks l
 The `with` settings are:
 
 - `repo-token` (**required**): The `GITHUB_TOKEN` secret.
-- `labels` (optional): A comma-separated list of labels to apply to issues closed by this action.
-- `comment` (optional): A message to post when closing the issue.
-- `title-contains` (optional): Text that, if matched, closes the issue.
-- `body-contains` (optional): Text that, if matched, closes the issue.
+- `labels` (optional): A comma-separated list of labels to apply to issues closed by this action
+- `comment` (optional): A message to post when closing the issue
+- `normalize-newlines` (optional): boolean, whether to normalize CRLF to LF in issue and condition text
+- `title-contains` (optional): Text that, if matched, closes the issue
+- `body-contains` (optional): Text that, if matched, closes the issue
 
 **Note**: If both `title-contains` and `body-contains` are set, then both conditions must be satisifed to close the issue.
 
