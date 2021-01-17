@@ -11,6 +11,11 @@ inputs:
   comment:
     description: "A GitHub Flavored Markdown string to comment on the invalid issue"
 
+  normalize-newlines:
+    description: "Normalize newline characters to LF in issue details and conditions"
+    default: false
+    required: false
+
   # Possible conditions
   title-contains:
     description: "String to search for in issue title"

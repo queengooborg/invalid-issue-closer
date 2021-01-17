@@ -1,3 +1,7 @@
+const normalizeNewline = require("normalize-newline");
+
+const dontNormalizeNewline = (str) => str;
+
 /**
  * Check whether an issue is invalid and eligible to be closed.
  *
@@ -9,14 +13,23 @@
  * @param {*} conditions
  * @returns {Boolean}
  */
-function isInvalid(issue, conditions) {
+function isInvalid(issue, conditions, options) {
+  const normal =
+    options && options.normalizeNewlines
+      ? normalizeNewline
+      : dontNormalizeNewline;
+
   if (issue.pull_request !== undefined) {
     return false;
   }
 
   const conditionsMet = {
-    body_contains: issue.body.includes(conditions.body_contains),
-    title_contains: issue.title.includes(conditions.title_contains),
+    body_contains: normal(issue.body).includes(
+      normal(conditions.body_contains)
+    ),
+    title_contains: normal(issue.title).includes(
+      normal(conditions.title_contains)
+    ),
   };
 
   const applicableConditionsMet = Object.keys(conditions).map(

@@ -12,6 +12,7 @@ async function run() {
     const settings = {
       labels: core.getInput("labels") || undefined,
       comment: core.getInput("comment") || undefined,
+      normalizeNewlines: core.getInput("normalize-newlines") || undefined,
     };
     const conditions = {
       title_contains: core.getInput("title-contains") || undefined,
@@ -34,7 +35,7 @@ async function run() {
     core.debug(JSON.stringify(issue, undefined, 2));
 
     core.debug(`Checking validity of ${owner}/${repo}#${issue_number}`);
-    if (isInvalid(issue, conditions)) {
+    if (isInvalid(issue, conditions, settings)) {
       await handleInvalidIssue(octokit, issueDetails, settings);
     }
   } catch (error) {

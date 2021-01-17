@@ -76,4 +76,22 @@ describe("isInvalid()", () => {
 
     expect(isInvalid(issue, conditions)).toBe(false);
   });
+
+  it("normalizes newlines with option", () => {
+    const issue = {
+      number: 1234,
+      title: "Some prefilled text - replaceme",
+      state: "open",
+      body: "deleteme-line1\r\ndeleteme-line2\r\n",
+    };
+    const conditions = {
+      title_contains: "replaceme",
+      body_contains: "deleteme-line1\ndeleteme-line2\n",
+    };
+
+    expect(isInvalid(issue, conditions, { normalizeNewlines: true })).toBe(
+      true
+    );
+    expect(isInvalid(issue, conditions)).toBe(false);
+  });
 });

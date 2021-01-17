@@ -27,7 +27,8 @@
   "homepage": "https://github.com/ddbeck/invalid-issue-closer#readme",
   "dependencies": {
     "@actions/core": "^1.2.6",
-    "@actions/github": "^4.0.0"
+    "@actions/github": "^4.0.0",
+    "normalize-newline": "^3.0.0"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.26.2",
