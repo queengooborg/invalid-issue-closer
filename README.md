@@ -49,6 +49,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           labels: "invalid :no_entry_sign:"
           comment: "This issue was automatically closed because it appears that the issue template has not been completed."
+          normalize-newlines: true
           title-contains: "<PUT TITLE HERE>"
           body-contains: "<PUT PROBLEM DESCRIPTION HERE>"
 ```
