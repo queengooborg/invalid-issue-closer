@@ -22,5 +22,5 @@ inputs:
   body-contains:
     description: "String to search for in issue body"
 runs:
-  using: "node12"
+  using: "node18"
   main: "dist/index.js"
