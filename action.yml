@@ -1,5 +1,9 @@
-name: "invalid-issue-closer"
+name: "Invalid issue closer"
 description: "Close an issue if it meets some requirements"
+author: "Queen Vinyl Da.i'gyu-Kazotetsu"
+branding:
+  icon: alert-triangle
+  color: red
 inputs:
   repo-token:
     description: "The GITHUB_TOKEN secret"
