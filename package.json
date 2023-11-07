@@ -13,19 +13,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ddbeck/invalid-issue-closer.git"
+    "url": "git+https://github.com/queengooborg/invalid-issue-closer.git"
   },
   "keywords": [
     "GitHub",
     "Actions",
-    "JavaScript"
+    "JavaScript",
+    "issues",
+    "project-management",
+    "open-source-management"
   ],
-  "author": "Daniel D. Beck",
+  "author": "Queen Vinyl Da.i'gyu-Kazotetsu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ddbeck/invalid-issue-closer/issues"
+    "url": "https://github.com/queengooborg/invalid-issue-closer/issues"
   },
-  "homepage": "https://github.com/ddbeck/invalid-issue-closer#readme",
+  "homepage": "https://github.com/queengooborg/invalid-issue-closer#readme",
   "dependencies": {
     "@actions/core": "^1.2.7",
     "@actions/github": "^6.0.0",
