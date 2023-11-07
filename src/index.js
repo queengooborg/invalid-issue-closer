@@ -31,7 +31,7 @@ async function run() {
     };
 
     core.debug(`Getting details for ${owner}/${repo}#${issue_number}`);
-    const issue = (await octokit.issues.get(issueDetails)).data;
+    const issue = (await octokit.rest.issues.get(issueDetails)).data;
     core.debug(JSON.stringify(issue, undefined, 2));
 
     core.debug(`Checking validity of ${owner}/${repo}#${issue_number}`);
@@ -54,17 +54,17 @@ async function handleInvalidIssue(octokit, context, settings) {
 }
 
 async function commentOnIssue(octokit, context, comment) {
-  octokit.issues.createComment({ ...context, body: comment });
+  octokit.rest.issues.createComment({ ...context, body: comment });
 }
 
 async function labelIssue(octokit, context, labels) {
   if (labels.length) {
-    octokit.issues.addLabels({ ...context, labels: labels.split(",") });
+    octokit.rest.issues.addLabels({ ...context, labels: labels.split(",") });
   }
 }
 
 async function closeIssue(octokit, context) {
-  octokit.issues.update({ ...context, state: "closed" });
+  octokit.rest.issues.update({ ...context, state: "closed" });
 }
 
 run();
