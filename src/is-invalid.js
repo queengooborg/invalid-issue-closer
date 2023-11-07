@@ -1,4 +1,4 @@
-const normalizeNewline = require("normalize-newline");
+import normalizeNewline from "normalize-newline";
 
 const dontNormalizeNewline = (str) => str;
 
@@ -25,19 +25,19 @@ function isInvalid(issue, conditions, options) {
 
   const conditionsMet = {
     body_contains: normal(issue.body).includes(
-      normal(conditions.body_contains)
+      normal(conditions.body_contains),
     ),
     title_contains: normal(issue.title).includes(
-      normal(conditions.title_contains)
+      normal(conditions.title_contains),
     ),
   };
 
   const applicableConditionsMet = Object.keys(conditions).map(
-    (key) => conditionsMet[key]
+    (key) => conditionsMet[key],
   );
   const invalid = applicableConditionsMet.every((v) => v);
 
   return invalid;
 }
 
-module.exports = isInvalid;
+export default isInvalid;

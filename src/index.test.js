@@ -1,6 +1,6 @@
-const process = require("process");
-const cp = require("child_process");
-const path = require("path");
+import process from "node:process";
+import cp from "node:child_process";
+import path from "node:path";
 
 // shows how the runner will run a javascript action with env / stdout protocol
 test.skip("test runs", () => {

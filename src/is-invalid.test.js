@@ -1,4 +1,4 @@
-const isInvalid = require("./is-invalid");
+import isInvalid from "./is-invalid.js";
 
 describe("isInvalid()", () => {
   it("returns false when 0 of 1 conditions are met", () => {
@@ -90,7 +90,7 @@ describe("isInvalid()", () => {
     };
 
     expect(isInvalid(issue, conditions, { normalizeNewlines: true })).toBe(
-      true
+      true,
     );
     expect(isInvalid(issue, conditions)).toBe(false);
   });
