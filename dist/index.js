@@ -30055,12 +30055,12 @@ function isInvalid(issue, conditions, options) {
   }
 
   const conditionsMet = {
-    body_contains: normal(issue.body).includes(
-      normal(conditions.body_contains),
-    ),
-    title_contains: normal(issue.title).includes(
-      normal(conditions.title_contains),
-    ),
+    body_contains:
+      conditions.body_contains &&
+      normal(issue.body).includes(normal(conditions.body_contains)),
+    title_contains:
+      conditions.title_contains &&
+      normal(issue.title).includes(normal(conditions.title_contains)),
   };
 
   const applicableConditionsMet = Object.keys(conditions).map(
@@ -30088,7 +30088,7 @@ async function run() {
     const settings = {
       labels: core.getInput("labels") || undefined,
       comment: core.getInput("comment") || undefined,
-      normalizeNewlines: core.getInput("normalize-newlines") || undefined,
+      normalizeNewlines: !!core.getInput("normalize-newlines"),
     };
     const conditions = {
       title_contains: core.getInput("title-contains") || undefined,

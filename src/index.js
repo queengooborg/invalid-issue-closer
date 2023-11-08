@@ -12,7 +12,7 @@ async function run() {
     const settings = {
       labels: core.getInput("labels") || undefined,
       comment: core.getInput("comment") || undefined,
-      normalizeNewlines: core.getInput("normalize-newlines") || undefined,
+      normalizeNewlines: !!core.getInput("normalize-newlines"),
     };
     const conditions = {
       title_contains: core.getInput("title-contains") || undefined,
