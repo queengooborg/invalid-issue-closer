@@ -1,4 +1,5 @@
 import isInvalid from "./is-invalid.js";
+import { expect } from "chai";
 
 describe("isInvalid()", () => {
   it("returns false when 0 of 1 conditions are met", () => {
@@ -12,7 +13,7 @@ describe("isInvalid()", () => {
       title_contains: "replaceme",
     };
 
-    expect(isInvalid(issue, conditions)).toBe(false);
+    expect(isInvalid(issue, conditions)).to.equal(false);
   });
 
   it("returns true when 1 of 1 condition is met", () => {
@@ -26,7 +27,7 @@ describe("isInvalid()", () => {
       title_contains: "replaceme",
     };
 
-    expect(isInvalid(issue, conditions)).toBe(true);
+    expect(isInvalid(issue, conditions)).to.equal(true);
   });
 
   it("returns false when 1 of 2 condition is met", () => {
@@ -41,7 +42,7 @@ describe("isInvalid()", () => {
       body_contains: "deleteme",
     };
 
-    expect(isInvalid(issue, conditions)).toBe(false);
+    expect(isInvalid(issue, conditions)).to.equal(false);
   });
 
   it("returns true when 2 of 2 conditions are met", () => {
@@ -56,7 +57,7 @@ describe("isInvalid()", () => {
       body_contains: "deleteme",
     };
 
-    expect(isInvalid(issue, conditions)).toBe(true);
+    expect(isInvalid(issue, conditions)).to.equal(true);
   });
 
   it("returns false when issue is a pull request", () => {
@@ -74,7 +75,7 @@ describe("isInvalid()", () => {
       body_contains: "deleteme",
     };
 
-    expect(isInvalid(issue, conditions)).toBe(false);
+    expect(isInvalid(issue, conditions)).to.equal(false);
   });
 
   it("normalizes newlines with option", () => {
@@ -89,9 +90,9 @@ describe("isInvalid()", () => {
       body_contains: "deleteme-line1\ndeleteme-line2\n",
     };
 
-    expect(isInvalid(issue, conditions, { normalizeNewlines: true })).toBe(
+    expect(isInvalid(issue, conditions, { normalizeNewlines: true })).to.equal(
       true,
     );
-    expect(isInvalid(issue, conditions)).toBe(false);
+    expect(isInvalid(issue, conditions)).to.equal(false);
   });
 });
