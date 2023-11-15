@@ -32,9 +32,9 @@ function isInvalid(issue, conditions, options) {
       normal(issue.title).includes(normal(conditions.title_contains)),
   };
 
-  const applicableConditionsMet = Object.keys(conditions).map(
-    (key) => conditionsMet[key],
-  );
+  const applicableConditionsMet = Object.entries(conditions)
+    .filter((e) => !!e[1])
+    .map((e) => conditionsMet[e[0]]);
   const invalid = applicableConditionsMet.every((v) => v);
 
   return invalid;
