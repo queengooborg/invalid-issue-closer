@@ -64,7 +64,11 @@ async function labelIssue(octokit, context, labels) {
 }
 
 async function closeIssue(octokit, context) {
-  octokit.rest.issues.update({ ...context, state: "closed" });
+  octokit.rest.issues.update({
+    ...context,
+    state: "closed",
+    state_reason: "not_planned",
+  });
 }
 
 run();
