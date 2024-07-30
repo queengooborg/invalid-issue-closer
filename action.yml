@@ -20,13 +20,21 @@ inputs:
     default: false
     required: false
 
+  any:
+    description: "Close the issue if it meets ANY condition (default behavior: ALL)"
+    default: false
+    required: false
+
   # Possible conditions
   title-contains:
     description: "String to search for in issue title"
+    required: false
   body-contains:
     description: "String to search for in issue body"
+    required: false
   body-is-blank:
     description: "If the body is blank, close the issue"
+    required: false
 runs:
   using: "node20"
   main: "dist/index.js"

@@ -30067,7 +30067,9 @@ function isInvalid(issue, conditions, options) {
   const applicableConditionsMet = Object.entries(conditions)
     .filter((e) => !!e[1])
     .map((e) => conditionsMet[e[0]]);
-  const invalid = applicableConditionsMet.every((v) => v);
+  const invalid = options.any
+    ? applicableConditionsMet.some((v) => v)
+    : applicableConditionsMet.every((v) => v);
 
   return invalid;
 }
@@ -30090,11 +30092,12 @@ async function run() {
       labels: core.getInput("labels") || undefined,
       comment: core.getInput("comment") || undefined,
       normalizeNewlines: !!core.getInput("normalize-newlines"),
+      any: !!core.getInput("any"),
     };
     const conditions = {
       title_contains: core.getInput("title-contains") || undefined,
       body_contains: core.getInput("body-contains") || undefined,
-      body_is_blank: core.getInput("body-is-blank") || false,
+      body_is_blank: !!core.getInput("body-is-blank"),
     };
 
     core.debug("Getting GitHub issue context");

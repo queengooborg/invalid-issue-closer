@@ -36,7 +36,9 @@ function isInvalid(issue, conditions, options) {
   const applicableConditionsMet = Object.entries(conditions)
     .filter((e) => !!e[1])
     .map((e) => conditionsMet[e[0]]);
-  const invalid = applicableConditionsMet.every((v) => v);
+  const invalid = options.any
+    ? applicableConditionsMet.some((v) => v)
+    : applicableConditionsMet.every((v) => v);
 
   return invalid;
 }

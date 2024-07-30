@@ -13,11 +13,12 @@ async function run() {
       labels: core.getInput("labels") || undefined,
       comment: core.getInput("comment") || undefined,
       normalizeNewlines: !!core.getInput("normalize-newlines"),
+      any: !!core.getInput("any"),
     };
     const conditions = {
       title_contains: core.getInput("title-contains") || undefined,
       body_contains: core.getInput("body-contains") || undefined,
-      body_is_blank: core.getInput("body-is-blank") || false,
+      body_is_blank: !!core.getInput("body-is-blank"),
     };
 
     core.debug("Getting GitHub issue context");
