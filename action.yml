@@ -25,6 +25,8 @@ inputs:
     description: "String to search for in issue title"
   body-contains:
     description: "String to search for in issue body"
+  body-is-blank:
+    description: "If the body is blank, close the issue"
 runs:
   using: "node20"
   main: "dist/index.js"

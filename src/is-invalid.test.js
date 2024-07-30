@@ -60,6 +60,20 @@ describe("isInvalid()", () => {
     expect(isInvalid(issue, conditions)).to.equal(true);
   });
 
+  it("Condition for a blank body", () => {
+    const issue = {
+      number: 1234,
+      title: "Foo bar",
+      state: "open",
+      body: "",
+    };
+    const conditions = {
+      body_is_blank: true,
+    };
+
+    expect(isInvalid(issue, conditions)).to.equal(true);
+  });
+
   it("returns false when issue is a pull request", () => {
     const issue = {
       number: 1234,

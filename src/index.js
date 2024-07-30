@@ -17,6 +17,7 @@ async function run() {
     const conditions = {
       title_contains: core.getInput("title-contains") || undefined,
       body_contains: core.getInput("body-contains") || undefined,
+      body_is_blank: core.getInput("body-is-blank") || false,
     };
 
     core.debug("Getting GitHub issue context");

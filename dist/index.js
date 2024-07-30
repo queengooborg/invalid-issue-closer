@@ -30058,6 +30058,7 @@ function isInvalid(issue, conditions, options) {
     body_contains:
       conditions.body_contains &&
       normal(issue.body).includes(normal(conditions.body_contains)),
+    body_is_blank: conditions.body_is_blank && normal(issue.body) == "",
     title_contains:
       conditions.title_contains &&
       normal(issue.title).includes(normal(conditions.title_contains)),
@@ -30093,6 +30094,7 @@ async function run() {
     const conditions = {
       title_contains: core.getInput("title-contains") || undefined,
       body_contains: core.getInput("body-contains") || undefined,
+      body_is_blank: core.getInput("body-is-blank") || false,
     };
 
     core.debug("Getting GitHub issue context");
