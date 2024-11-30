@@ -14,6 +14,7 @@ async function run() {
       comment: core.getInput("comment") || undefined,
       normalizeNewlines: !!core.getInput("normalize-newlines"),
       any: !!core.getInput("any"),
+      lock: core.getInput("lock"),
     };
     const conditions = {
       title_contains: core.getInput("title-contains") || undefined,
@@ -53,6 +54,9 @@ async function handleInvalidIssue(octokit, context, settings) {
     await commentOnIssue(octokit, context, settings.comment);
   }
   await closeIssue(octokit, context);
+  if (settings.lock) {
+    await lockIssue(octokit, context, settings.lock);
+  }
 }
 
 async function commentOnIssue(octokit, context, comment) {
@@ -70,6 +74,13 @@ async function closeIssue(octokit, context) {
     ...context,
     state: "closed",
     state_reason: "not_planned",
+  });
+}
+
+async function lockIssue(octokit, context, lockReason) {
+  octokit.rest.issues.lock({
+    ...context,
+    lock_reason: lockReason === true ? false : lockReason
   });
 }
 

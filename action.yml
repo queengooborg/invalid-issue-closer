@@ -24,6 +24,10 @@ inputs:
     description: "Close the issue if it meets ANY condition (default behavior: ALL)"
     default: false
     required: false
+  lock:
+    description: "Lock the issue after automatically closing it; may be a string to specify a reason for locking the issue (['off-topic', 'too heated', 'resolved', 'spam'])"
+    default: false
+    required: false
 
   # Possible conditions
   title-contains:
