@@ -39,6 +39,9 @@ inputs:
   body-is-blank:
     description: "If the body is blank, close the issue"
     required: false
+outputs:
+  was-closed:
+    description: "Whether the issue was closed"
 runs:
   using: "node20"
   main: "dist/index.js"

@@ -38,9 +38,11 @@ async function run() {
     core.debug(JSON.stringify(issue, undefined, 2));
 
     core.debug(`Checking validity of ${owner}/${repo}#${issue_number}`);
-    if (isInvalid(issue, conditions, settings)) {
+    const invalid = isInvalid(issue, conditions, settings);
+    if (invalid) {
       await handleInvalidIssue(octokit, issueDetails, settings);
     }
+    core.setOutput('was-closed', invalid);
   } catch (error) {
     core.setFailed(error.stack);
   }
