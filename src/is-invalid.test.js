@@ -127,16 +127,31 @@ describe("isInvalid()", () => {
     expect(isInvalid(issue, conditions, {})).to.equal(false);
   });
 
-  it("Blank issue body", () => {
-    const issue = {
-      number: 1234,
-      title: "Some prefilled text - replaceme",
-      state: "open",
-    };
-    const conditions = {
-      body_is_blank: true,
-    };
+  describe("Blank issue body", () => {
+    it("True", () => {
+      const issue = {
+        number: 1234,
+        title: "Some prefilled text - replaceme",
+        state: "open",
+      };
+      const conditions = {
+        body_is_blank: true,
+      };
 
-    expect(isInvalid(issue, conditions, {})).to.equal(true);
+      expect(isInvalid(issue, conditions, {})).to.equal(true);
+    });
+    it("False", () => {
+      const issue = {
+        number: 1234,
+        title: "Some prefilled text - replaceme",
+        state: "open",
+        body: "Hello world",
+      };
+      const conditions = {
+        body_is_blank: true,
+      };
+
+      expect(isInvalid(issue, conditions, {})).to.equal(false);
+    });
   });
 });
