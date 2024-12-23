@@ -14,7 +14,7 @@ async function run() {
       comment: core.getInput("comment") || undefined,
       normalizeNewlines: !!core.getInput("normalize-newlines"),
       any: !!core.getInput("any"),
-      lock: core.getInput("lock"),
+      lock: core.getInput("lock") || undefined,
     };
     const conditions = {
       title_contains: core.getInput("title-contains") || undefined,
