@@ -31759,7 +31759,7 @@ function isInvalid(issue, conditions, options) {
     body_contains:
       conditions.body_contains &&
       normal(issue.body).includes(normal(conditions.body_contains)),
-    body_is_blank: conditions.body_is_blank && normal(issue.body) == "",
+    body_is_blank: conditions.body_is_blank && !!issue.body,
     title_contains:
       conditions.title_contains &&
       normal(issue.title).includes(normal(conditions.title_contains)),
