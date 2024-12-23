@@ -31822,7 +31822,7 @@ async function run() {
     if (invalid) {
       await handleInvalidIssue(octokit, issueDetails, settings);
     }
-    core.setOutput('was-closed', invalid);
+    core.setOutput("was-closed", invalid);
   } catch (error) {
     core.setFailed(error.stack);
   }
@@ -31862,7 +31862,7 @@ async function closeIssue(octokit, context) {
 async function lockIssue(octokit, context, lockReason) {
   octokit.rest.issues.lock({
     ...context,
-    lock_reason: lockReason === true ? false : lockReason
+    lock_reason: lockReason,
   });
 }
 
