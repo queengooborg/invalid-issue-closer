@@ -20,6 +20,7 @@ async function run() {
       title_contains: core.getInput("title-contains") || undefined,
       body_contains: core.getInput("body-contains") || undefined,
       body_is_blank: !!core.getInput("body-is-blank"),
+      is_spammy: !!core.getInput("is-spammy"),
     };
 
     core.debug("Getting GitHub issue context");

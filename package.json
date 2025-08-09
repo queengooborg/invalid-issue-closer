@@ -1,6 +1,6 @@
 {
   "name": "invalid-issue-closer",
-  "version": "1.5.4",
+  "version": "1.6.0",
   "description": "Close new issues that meet certain conditions.",
   "main": "src/index.js",
   "type": "module",
@@ -32,14 +32,14 @@
   "homepage": "https://github.com/queengooborg/invalid-issue-closer#readme",
   "dependencies": {
     "@actions/core": "^1.2.7",
-    "@actions/github": "^6.0.0",
+    "@actions/github": "^6.0.1",
     "normalize-newline": "^4.1.0"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.38.1",
-    "chai": "^5.1.2",
-    "eslint": "^9.16.0",
-    "mocha": "^10.2.0",
-    "prettier": "^3.0.3"
+    "chai": "^5.2.1",
+    "eslint": "^9.33.0",
+    "mocha": "^11.7.1",
+    "prettier": "^3.6.2"
   }
 }

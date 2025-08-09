@@ -1,5 +1,7 @@
 import normalizeNewline from "normalize-newline";
 
+import detectSpam from "./is-spam.js";
+
 const dontNormalizeNewline = (str) => str;
 
 /**
@@ -31,6 +33,7 @@ function isInvalid(issue, conditions, options) {
     title_contains:
       conditions.title_contains &&
       normal(issue.title).includes(normal(conditions.title_contains)),
+    is_spammy: conditions.is_spammy && detectSpam(issue.body).isSpam,
   };
 
   const applicableConditionsMet = Object.entries(conditions)

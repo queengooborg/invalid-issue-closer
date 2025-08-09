@@ -1871,6 +1871,7 @@ class Context {
         this.action = process.env.GITHUB_ACTION;
         this.actor = process.env.GITHUB_ACTOR;
         this.job = process.env.GITHUB_JOB;
+        this.runAttempt = parseInt(process.env.GITHUB_RUN_ATTEMPT, 10);
         this.runNumber = parseInt(process.env.GITHUB_RUN_NUMBER, 10);
         this.runId = parseInt(process.env.GITHUB_RUN_ID, 10);
         this.apiUrl = (_a = process.env.GITHUB_API_URL) !== null && _a !== void 0 ? _a : `https://api.github.com`;
@@ -3714,7 +3715,7 @@ module.exports = __toCommonJS(dist_src_exports);
 var import_universal_user_agent = __nccwpck_require__(3843);
 
 // pkg/dist-src/version.js
-var VERSION = "9.0.5";
+var VERSION = "9.0.6";
 
 // pkg/dist-src/defaults.js
 var userAgent = `octokit-endpoint.js/${VERSION} ${(0, import_universal_user_agent.getUserAgent)()}`;
@@ -3819,9 +3820,9 @@ function addQueryParameters(url, parameters) {
 }
 
 // pkg/dist-src/util/extract-url-variable-names.js
-var urlVariableRegex = /\{[^}]+\}/g;
+var urlVariableRegex = /\{[^{}}]+\}/g;
 function removeNonChars(variableName) {
-  return variableName.replace(/^\W+|\W+$/g, "").split(/,/);
+  return variableName.replace(/(?:^\W+)|(?:(?<!\W)\W+$)/g, "").split(/,/);
 }
 function extractUrlVariableNames(url) {
   const matches = url.match(urlVariableRegex);
@@ -4007,7 +4008,7 @@ function parse(options) {
     }
     if (url.endsWith("/graphql")) {
       if (options.mediaType.previews?.length) {
-        const previewsFromAcceptHeader = headers.accept.match(/[\w-]+(?=-preview)/g) || [];
+        const previewsFromAcceptHeader = headers.accept.match(/(?<![\w-])[\w-]+(?=-preview)/g) || [];
         headers.accept = previewsFromAcceptHeader.concat(options.mediaType.previews).map((preview) => {
           const format = options.mediaType.format ? `.${options.mediaType.format}` : "+json";
           return `application/vnd.github.${preview}-preview${format}`;
@@ -4254,7 +4255,7 @@ __export(dist_src_exports, {
 module.exports = __toCommonJS(dist_src_exports);
 
 // pkg/dist-src/version.js
-var VERSION = "9.2.1";
+var VERSION = "9.2.2";
 
 // pkg/dist-src/normalize-paginated-list-response.js
 function normalizePaginatedListResponse(response) {
@@ -4302,7 +4303,7 @@ function iterator(octokit, route, parameters) {
           const response = await requestMethod({ method, url, headers });
           const normalizedResponse = normalizePaginatedListResponse(response);
           url = ((normalizedResponse.headers.link || "").match(
-            /<([^>]+)>;\s*rel="next"/
+            /<([^<>]+)>;\s*rel="next"/
           ) || [])[1];
           return { value: normalizedResponse };
         } catch (error) {
@@ -6852,7 +6853,7 @@ var RequestError = class extends Error {
     if (options.request.headers.authorization) {
       requestCopy.headers = Object.assign({}, options.request.headers, {
         authorization: options.request.headers.authorization.replace(
-          / .*$/,
+          /(?<! ) .*$/,
           " [REDACTED]"
         )
       });
@@ -6919,7 +6920,7 @@ var import_endpoint = __nccwpck_require__(4471);
 var import_universal_user_agent = __nccwpck_require__(3843);
 
 // pkg/dist-src/version.js
-var VERSION = "8.4.0";
+var VERSION = "8.4.1";
 
 // pkg/dist-src/is-plain-object.js
 function isPlainObject(value) {
@@ -6978,7 +6979,7 @@ function fetchWrapper(requestOptions) {
       headers[keyAndValue[0]] = keyAndValue[1];
     }
     if ("deprecation" in headers) {
-      const matches = headers.link && headers.link.match(/<([^>]+)>; rel="deprecation"/);
+      const matches = headers.link && headers.link.match(/<([^<>]+)>; rel="deprecation"/);
       const deprecationLink = matches && matches.pop();
       log.warn(
         `[@octokit/request] "${requestOptions.method} ${requestOptions.url}" is deprecated. It is scheduled to be removed on ${headers.sunset}${deprecationLink ? `. See ${deprecationLink}` : ""}`
@@ -13004,7 +13005,7 @@ module.exports = {
 
 
 const { parseSetCookie } = __nccwpck_require__(8915)
-const { stringify, getHeadersList } = __nccwpck_require__(3834)
+const { stringify } = __nccwpck_require__(3834)
 const { webidl } = __nccwpck_require__(4222)
 const { Headers } = __nccwpck_require__(6349)
 
@@ -13080,14 +13081,13 @@ function getSetCookies (headers) {
 
   webidl.brandCheck(headers, Headers, { strict: false })
 
-  const cookies = getHeadersList(headers).cookies
+  const cookies = headers.getSetCookie()
 
   if (!cookies) {
     return []
   }
 
-  // In older versions of undici, cookies is a list of name:value.
-  return cookies.map((pair) => parseSetCookie(Array.isArray(pair) ? pair[1] : pair))
+  return cookies.map((pair) => parseSetCookie(pair))
 }
 
 /**
@@ -13514,13 +13514,14 @@ module.exports = {
 /***/ }),
 
 /***/ 3834:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ ((module) => {
 
 
 
-const assert = __nccwpck_require__(2613)
-const { kHeadersList } = __nccwpck_require__(6443)
-
+/**
+ * @param {string} value
+ * @returns {boolean}
+ */
 function isCTLExcludingHtab (value) {
   if (value.length === 0) {
     return false
@@ -13781,31 +13782,13 @@ function stringify (cookie) {
   return out.join('; ')
 }
 
-let kHeadersListNode
-
-function getHeadersList (headers) {
-  if (headers[kHeadersList]) {
-    return headers[kHeadersList]
-  }
-
-  if (!kHeadersListNode) {
-    kHeadersListNode = Object.getOwnPropertySymbols(headers).find(
-      (symbol) => symbol.description === 'headers list'
-    )
-
-    assert(kHeadersListNode, 'Headers cannot be parsed')
-  }
-
-  const headersList = headers[kHeadersListNode]
-  assert(headersList)
-
-  return headersList
-}
-
 module.exports = {
   isCTLExcludingHtab,
-  stringify,
-  getHeadersList
+  validateCookieName,
+  validateCookiePath,
+  validateCookieValue,
+  toIMFDate,
+  stringify
 }
 
 
@@ -15726,6 +15709,14 @@ const { isUint8Array, isArrayBuffer } = __nccwpck_require__(8253)
 const { File: UndiciFile } = __nccwpck_require__(3041)
 const { parseMIMEType, serializeAMimeType } = __nccwpck_require__(4322)
 
+let random
+try {
+  const crypto = __nccwpck_require__(7598)
+  random = (max) => crypto.randomInt(0, max)
+} catch {
+  random = (max) => Math.floor(Math.random(max))
+}
+
 let ReadableStream = globalThis.ReadableStream
 
 /** @type {globalThis['File']} */
@@ -15811,7 +15802,7 @@ function extractBody (object, keepalive = false) {
     // Set source to a copy of the bytes held by object.
     source = new Uint8Array(object.buffer.slice(object.byteOffset, object.byteOffset + object.byteLength))
   } else if (util.isFormDataLike(object)) {
-    const boundary = `----formdata-undici-0${`${Math.floor(Math.random() * 1e11)}`.padStart(11, '0')}`
+    const boundary = `----formdata-undici-0${`${random(1e11)}`.padStart(11, '0')}`
     const prefix = `--${boundary}\r\nContent-Disposition: form-data`
 
     /*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
@@ -17788,6 +17779,7 @@ const {
   isValidHeaderName,
   isValidHeaderValue
 } = __nccwpck_require__(5523)
+const util = __nccwpck_require__(9023)
 const { webidl } = __nccwpck_require__(4222)
 const assert = __nccwpck_require__(2613)
 
@@ -18341,6 +18333,9 @@ Object.defineProperties(Headers.prototype, {
   [Symbol.toStringTag]: {
     value: 'Headers',
     configurable: true
+  },
+  [util.inspect.custom]: {
+    enumerable: false
   }
 })
 
@@ -27488,6 +27483,20 @@ class Pool extends PoolBase {
       ? { ...options.interceptors }
       : undefined
     this[kFactory] = factory
+
+    this.on('connectionError', (origin, targets, error) => {
+      // If a connection error occurs, we remove the client from the pool,
+      // and emit a connectionError event. They will not be re-used.
+      // Fixes https://github.com/nodejs/undici/issues/3895
+      for (const target of targets) {
+        // Do not use kRemoveClient here, as it will close the client,
+        // but the client cannot be closed in this state.
+        const idx = this[kClients].indexOf(target)
+        if (idx !== -1) {
+          this[kClients].splice(idx, 1)
+        }
+      }
+    })
   }
 
   [kGetDispatcher] () {
@@ -29938,6 +29947,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("net");
 
 /***/ }),
 
+/***/ 7598:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:crypto");
+
+/***/ }),
+
 /***/ 8474:
 /***/ ((module) => {
 
@@ -31729,7 +31745,354 @@ function normalizeNewline(input) {
 	return Buffer.isBuffer(input) ? replace_buffer(input, CRLF, '\n') : input.replace(new RegExp(CRLF, 'g'), '\n');
 }
 
+;// CONCATENATED MODULE: ./src/is-spam.js
+function detectSpam(bodyRaw, options = {}) {
+  const cfg = {
+    spamThreshold: 3,
+    nonTemplateThreshold: 1,
+    sectionMinJunkRatio: 0.6,
+    entropyFloor: 3,
+    uniqueTokenFloor: 0.35,
+    ignoredSections: [
+      "mdn url",
+      "mdn metadata",
+      "mdn page report details",
+      "what type of issue is this?",
+      "what browsers does this problem apply to, if applicable?",
+    ],
+    badDomains: ["onlyfans.com", "pornhub.com"],
+    strongSectionMinChars: 200,
+    strongSectionMinTokens: 40,
+    ...options,
+  };
+
+  const body = bodyRaw.replace(/\r\n/g, "\n").trim();
+
+  // --- Easy rules (fast path) ---
+  const isBlank = removeHtmlComments(body).trim().length === 0;
+  const isOnlyLink = isLinkOnly(body);
+  const isTooShort = body.trim().length < 20;
+  const isOnlyBlockquotes = bodyOnlyBlockquotes(body);
+  const isOnlyImages = bodyOnlyImages(body);
+
+  // “Originally posted by …” variants (plain/#123/markdown link/full URL)
+  const isQuotedOtherIssue =
+    /_?Originally posted by @\w+ in (?:#\d+|\[#\d+\]\([^)]*\)|https?:\/\/github\.com\/[^\s)\]]+)\s?$/i.test(
+      body,
+    );
+
+  // “[spam]” placeholder
+  const isCensoredSpam =
+    /^['"`\s]*$begin:math:display$\\s*spam\\s*$end:math:display$['"`\s]*$/i.test(
+      removeHtmlComments(body),
+    );
+
+  // NEW: banned domains present anywhere (raw or in markdown links)
+  const badDomainHit = containsBadDomain(body, cfg.badDomains);
+
+  let reasons = [];
+  if (isBlank) reasons.push("blank body");
+  if (isOnlyLink) reasons.push("only a link");
+  if (isTooShort) reasons.push("body too short");
+  if (isOnlyBlockquotes) reasons.push("body is only blockquotes");
+  if (isOnlyImages) reasons.push("body is only images");
+  if (isQuotedOtherIssue) reasons.push("quote of another issue");
+  if (isCensoredSpam) reasons.push("censored spam placeholder");
+  if (badDomainHit) reasons.push(`contains banned domain: ${badDomainHit}`);
+
+  if (reasons.length) {
+    return { isSpam: true, score: 99, reasons, sections: [] };
+  }
+
+  // --- Template-aware parsing ---
+  const sectionsAll = splitSections(body);
+  const sections = sectionsAll.filter(
+    (s) => !cfg.ignoredSections.includes(s.title.toLowerCase()),
+  );
+
+  // Normalize answers
+  const answers = sections.map((s) => s.answer);
+  const normalized = answers.map(normText).filter(Boolean);
+
+  // Counts
+  const minimalCount = answers.filter(isMinimalContent).length;
+  const linkOnlyCount = answers.filter(isLinkOnly).length;
+  const imageOnlyCount = answers.filter(isImageOnly).length;
+
+  // Detect strong sections
+  const sectionStats = answers.map((a) => {
+    const t = normText(a);
+    const tokens = t ? t.split(/\s+/).filter(Boolean) : [];
+    return { len: t.length, tokens: tokens.length };
+  });
+  const strongSections = sectionStats.filter(
+    (st) =>
+      st.len >= cfg.strongSectionMinChars ||
+      st.tokens >= cfg.strongSectionMinTokens,
+  ).length;
+
+  // Repetition / low-entropy
+  const joined = normalized.join(" ");
+  const entropy = shannonEntropy(joined);
+  const tokens = joined.split(/\W+/).filter(Boolean);
+  const uniqueRatio = tokens.length ? new Set(tokens).size / tokens.length : 0;
+
+  // Canonicalize before counting repeats (so "Duplicate of #27058/#27059" collapse)
+  const counts = new Map();
+  for (const a of answers) {
+    const canon = canonicalizeForRepeat(a);
+    if (!canon || canon === "no response") continue;
+    // If there is a strong section, ignore repeats of short boilerplate
+    if (strongSections > 0 && canon.length <= 50) continue;
+    counts.set(canon, (counts.get(canon) || 0) + 1);
+  }
+  const maxRepeat = Math.max(0, ...counts.values());
+
+  // Score
+  let score = 0;
+  let detail = [];
+
+  if (strongSections == 0 && minimalCount >= 2) {
+    score += minimalCount;
+    detail.push(`${minimalCount} minimal answers`);
+  }
+  if (linkOnlyCount >= 2) {
+    score += linkOnlyCount;
+    detail.push(`${linkOnlyCount} link-only answers`);
+  }
+  if (imageOnlyCount >= 2) {
+    score += imageOnlyCount;
+    detail.push(`${imageOnlyCount} image-only answers`);
+  }
+  if (maxRepeat >= 2) {
+    score += maxRepeat;
+    detail.push(`same answer repeated ${maxRepeat} times (canonical)`);
+  }
+  if (entropy < cfg.entropyFloor) {
+    score += 1;
+    detail.push(`low entropy (${entropy.toFixed(2)})`);
+  }
+  if (uniqueRatio < cfg.uniqueTokenFloor) {
+    score += 1;
+    detail.push(`low unique-token ratio (${uniqueRatio.toFixed(2)})`);
+  }
+
+  const hasSections = sections.length >= 2;
+  const junkCount = minimalCount + linkOnlyCount;
+  if (
+    hasSections &&
+    junkCount >= Math.ceil(sections.length * cfg.sectionMinJunkRatio)
+  ) {
+    score += 2;
+    detail.push(`most sections are minimal/link-only`);
+  }
+
+  return {
+    isSpam:
+      score >= (hasSections ? cfg.spamThreshold : cfg.nonTemplateThreshold),
+    score,
+    reasons: detail,
+    sections,
+  };
+}
+
+/* ----------------- helpers ----------------- */
+
+function removeHtmlComments(s) {
+  return (s || "").replace(/<!--[\s\S]*?-->/g, "");
+}
+
+function isLinkOnly(s) {
+  const raw = removeHtmlComments(s || "").trim();
+  if (!raw) return false;
+
+  // Unwrap optional quotes/backticks around the whole section
+  const unwrapped = raw.replace(/^['"`]\s*([\s\S]*?)\s*['"`]$/m, "$1").trim();
+
+  // Remove markdown *image* links first (so images don't look like links)
+  let tmp = unwrapped.replace(
+    /!\[[^\]]*]\(\s*https?:\/\/[^)\s]+(?:\s+"[^"]*")?\s*\)/gim,
+    " ",
+  );
+
+  // Count markdown links and raw URLs before stripping
+  const mdLinkCount = (
+    tmp.match(/\[[^\]]*]\(\s*https?:\/\/[^)\s]+(?:\s+"[^"]*")?\s*\)/gim) || []
+  ).length;
+  const rawUrlCount = (tmp.match(/https?:\/\/[^\s)]+/gim) || []).length;
+  const hadAnyLink = mdLinkCount + rawUrlCount > 0;
+
+  // Remove markdown links and raw URLs
+  tmp = tmp
+    .replace(/\[[^\]]*]\(\s*https?:\/\/[^)\s]+(?:\s+"[^"]*")?\s*\)/gim, " ")
+    .replace(/https?:\/\/[^\s)]+/gim, " ");
+
+  // Strip punctuation/whitespace leftovers
+  const leftover = tmp.replace(/[\s.,;:!?"'(){}\[\]<>-]+/g, " ").trim();
+
+  return hadAnyLink && leftover.length === 0;
+}
+
+function isImageOnly(s) {
+  const noComments = removeHtmlComments(s || "").trim();
+  if (!noComments) return false;
+
+  // Strip markdown images: ![alt](url "title")
+  let stripped = noComments.replace(
+    /!\[[^\]]*]\(\s*https?:\/\/[^)\s]+(?:\s+"[^"]*")?\s*\)/gim,
+    " ",
+  );
+
+  // Strip HTML <img> tags, optionally wrapped in <a>
+  stripped = stripped
+    .replace(/<a[^>]*>\s*<img[^>]*>\s*<\/a>/gim, " ")
+    .replace(/<img[^>]*>/gim, " ");
+
+  // Remove trivial whitespace/punctuation artifacts
+  stripped = stripped.replace(/[\s.,;:!?"'(){}\[\]<>-]+/g, " ").trim();
+
+  // If nothing meaningful remains, it was image-only
+  return stripped.length === 0;
+}
+
+// Body is only blockquotes (ignoring blank lines and comments)
+function bodyOnlyBlockquotes(s) {
+  const noComments = removeHtmlComments(s || "");
+  const lines = noComments
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (!lines.length) return false;
+  return lines.every(
+    (l) => l.startsWith(">") || /^_?Originally posted by @/i.test(l),
+  );
+}
+
+// NEW: Body is only images (markdown and/or HTML), possibly multiple
+function bodyOnlyImages(s) {
+  const noComments = removeHtmlComments(s || "").trim();
+  if (!noComments) return false;
+  // Remove markdown images: ![alt](url "title")
+  let stripped = noComments
+    .replace(/!\[[^\]]*\]\(\s*https?:\/\/[^)]+\)/gim, "")
+    .trim();
+  // Remove HTML <img> tags (with optional wrapping <a>)
+  stripped = stripped
+    .replace(/<a[^>]*>\s*<img[^>]*>\s*<\/a>/gim, "")
+    .replace(/<img[^>]*>/gim, "")
+    .trim();
+  // Remove purely decorative line breaks
+  stripped = stripped.replace(/^[>\s-]*$/gim, "").trim();
+  return stripped.length === 0;
+}
+
+// Split on "### Heading" sections (common in GitHub issue forms)
+function splitSections(markdown) {
+  const lines = (markdown || "").split(/\r?\n/);
+  const sections = [];
+  let current = null;
+
+  const push = () => {
+    if (current) {
+      current.answer = current.answer.join("\n").trim();
+      sections.push(current);
+    }
+  };
+
+  for (const line of lines) {
+    if (/^###\s+/.test(line)) {
+      push();
+      const title = line.replace(/^###\s+/, "").trim();
+      current = { title, answer: [] };
+    } else {
+      if (!current) current = { title: "Body", answer: [] };
+      current.answer.push(line);
+    }
+  }
+  push();
+  return sections;
+}
+
+function stripMarkdown(s) {
+  return (s || "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/`{1,3}[\s\S]*?`{1,3}/g, "")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "") // markdown images
+    .replace(/<img[^>]*>/g, "") // html images
+    .replace(/<[^>]+>/g, " ") // ANY html tags (e.g., <div ...>)
+    .replace(/^>\s?.*$/gm, " ") // drop blockquote lines entirely
+    .replace(/\[([^\]]+)\]\((.*?)\)/g, "$1") // links -> text
+    .replace(/[*_#>~\-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normText(s) {
+  return stripMarkdown(s).toLowerCase();
+}
+
+// Canonicalize text for repeat detection (strip issue numbers & GH URLs)
+function canonicalizeForRepeat(s) {
+  return normText(s)
+    .replace(/#\d+/g, "#num")
+    .replace(/https?:\/\/github\.com\/[^\s)]+/g, "github_url")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isMinimalContent(s) {
+  const t = normText(s);
+  if (!t) return true;
+  // NOTE: keeping your current “No response” rule disabled to avoid FPs
+  if (/^duplicate of\s+#\d+\s*$/i.test(t)) return true; // treat as minimal
+  if (["n/a", "na", "none", "nil", "-", "--", ".", "…"].includes(t))
+    return true;
+  if (/^\p{Emoji}+$/u.test(t)) return true;
+  if (t.length <= 10) return true;
+  return false;
+}
+
+// NEW: check for banned domains (both raw URLs and inside markdown links)
+function containsBadDomain(body, domains) {
+  if (!domains?.length) return null;
+  const lower = (body || "").toLowerCase();
+  const flat = domains.map((d) => d.toLowerCase().replace(/^www\./, ""));
+  // Quick substring check first
+  for (const d of flat) {
+    if (lower.includes(d)) return d;
+  }
+  // More precise: extract URLs from markdown and raw text and test hostnames
+  const urls = [];
+  const mdLinks = [...lower.matchAll(/\[[^\]]*]\((https?:\/\/[^)\s]+)\)/g)];
+  for (const m of mdLinks) urls.push(m[1]);
+  const raws = [...lower.matchAll(/https?:\/\/[^\s)]+/g)];
+  for (const m of raws) urls.push(m[0]);
+  try {
+    for (const u of urls) {
+      const host = new URL(u).hostname.replace(/^www\./, "");
+      if (flat.includes(host)) return host;
+    }
+  } catch {}
+  return null;
+}
+
+function shannonEntropy(s) {
+  if (!s) return 0;
+  const freq = Object.create(null);
+  for (const ch of s) freq[ch] = (freq[ch] || 0) + 1;
+  const len = s.length;
+  let H = 0;
+  for (const k in freq) {
+    const p = freq[k] / len;
+    H -= p * Math.log2(p);
+  }
+  return H;
+}
+
+/* harmony default export */ const is_spam = (detectSpam);
 ;// CONCATENATED MODULE: ./src/is-invalid.js
+
+
 
 
 const dontNormalizeNewline = (str) => str;
@@ -31763,6 +32126,7 @@ function isInvalid(issue, conditions, options) {
     title_contains:
       conditions.title_contains &&
       normal(issue.title).includes(normal(conditions.title_contains)),
+    is_spammy: conditions.is_spammy && is_spam(issue.body).isSpam,
   };
 
   const applicableConditionsMet = Object.entries(conditions)
@@ -31800,6 +32164,7 @@ async function run() {
       title_contains: core.getInput("title-contains") || undefined,
       body_contains: core.getInput("body-contains") || undefined,
       body_is_blank: !!core.getInput("body-is-blank"),
+      is_spammy: !!core.getInput("is-spammy"),
     };
 
     core.debug("Getting GitHub issue context");
